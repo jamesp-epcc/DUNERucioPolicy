@@ -10,6 +10,7 @@ import json
 from datetime import datetime
 
 from rucio.common import config
+from rucio.rse import rsemanager
 from rucio.rse.protocols.protocol import RSEDeterministicTranslation
 
 metacat_base = None
@@ -20,8 +21,21 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
             return metadata[field]
         return 'None'
 
-    # FIXME: check to see if PFN is already stored in Rucio's metadata DB
-    # if so, just return it from there
+    # check to see if PFN is already cached in Rucio's metadata system
+    didclient = None
+    didmd = {}
+    if getattr(rsemanager, 'CLIENT_MODE', None):
+        from rucio.client.didclient import DIDClient
+        didclient = DIDClient()
+        didmd = didclient.get_metadata(scope, name)
+    if getattr(rsemanager, 'SERVER_MODE', None):
+        from rucio.core.did import get_metadata
+        didmd = get_metadata(scope, name)
+
+    # if it is, just return it
+    md_key = 'PFN_' + rse
+    if md_key in didmd:
+        return didmd[md_key]
 
     f = urllib2.urlopen(metacat_base + "app/data/file?name=" + urllib2.quote(name, ''))
     jsondata = json.load(f)
@@ -64,7 +78,13 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     
     pfn = 'pnfs/dune/tape_backed/dunepro/' + run_type + '/' + data_tier + '/' + year + '/' + file_type + '/' + data_stream + '/' + data_campaign + '/' + hash1 + '/' + hash2 + '/' + hash3 + '/' + hash4 + '/' + filename
 
-    # FIXME: store the PFN in Rucio metadata for next time
+    # store the PFN in Rucio metadata for next time
+    if getattr(rsemanager, 'CLIENT_MODE', None):
+        didclient.set_metadata(scope, name, md_key, pfn)
+    if getattr(rsemanager, 'SERVER_MODE', None):
+        from rucio.core.did import set_metadata
+        set_metadata(scope, name, md_key, pfn)
+
     return pfn
 
 
