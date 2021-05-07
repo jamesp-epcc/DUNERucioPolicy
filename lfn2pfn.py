@@ -37,13 +37,12 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     if md_key in didmd:
         return didmd[md_key]
 
-    f = urllib2.urlopen(metacat_base + "app/data/file?name=" + urllib2.quote(name, ''))
+    lfn = scope + ':' + name
+    f = urllib2.urlopen(metacat_base + "app/data/file?name=" + urllib2.quote(lfn, ''))
     jsondata = json.load(f)
     f.close()
 
     metadata = jsondata['metadata']
-
-    lfnbits = lfn.split(':')
 
     # determine year from timestamps
     timestamp = None
@@ -74,7 +73,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     file_type = get_metadata_field(metadata, 'core.file_type')
     data_stream = get_metadata_field(metadata, 'core.data_stream')
     data_campaign = get_metadata_field(metadata, 'DUNE.campaign')
-    filename = lfnbits[-1]
+    filename = name
     
     pfn = 'pnfs/dune/tape_backed/dunepro/' + run_type + '/' + data_tier + '/' + year + '/' + file_type + '/' + data_stream + '/' + data_campaign + '/' + hash1 + '/' + hash2 + '/' + hash3 + '/' + hash4 + '/' + filename
 
