@@ -25,6 +25,7 @@ from jsonschema import validate, ValidationError
 
 from rucio.common.exception import InvalidObject
 
+ACCOUNT_LENGTH = 25
 
 ACCOUNT = {"description": "Account name",
            "type": "string",
