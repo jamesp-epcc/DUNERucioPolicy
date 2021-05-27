@@ -9,13 +9,19 @@ except ImportError:
 import json
 from datetime import datetime
 
-from rucio.common import config
-from rucio.rse import rsemanager
-from rucio.rse.protocols.protocol import RSEDeterministicTranslation
-
 metacat_base = None
 
 def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
+    global metacat_base
+
+    from rucio.common import config
+    from rucio.rse import rsemanager
+
+    if metacat_base is None:
+        metacat_base = config.config_get('policy', 'metacat_base_url')
+        if metacat_base is None:
+            metacat_base = 'https://dbdata0vm.fnal.gov:9443/dune_meta_demo/'
+        
     def get_metadata_field(metadata, field):
         if field in metadata:
             return metadata[field]
@@ -85,11 +91,3 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
         set_metadata(scope, name, md_key, pfn)
 
     return pfn
-
-
-def register_dune_lfn2pfn_algorithm():
-    global metacat_base
-    RSEDeterministicTranslation.register(lfn2pfn_DUNE, 'DUNE')
-    metacat_base = config.config_get('policy', 'metacat_base_url')
-    if not metacat_base:
-        metacat_base = 'https://dbdata0vm.fnal.gov:9443/dune_meta_demo/'
