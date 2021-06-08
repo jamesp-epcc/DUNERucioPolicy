@@ -15,6 +15,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     global metacat_base
 
     from rucio.common import config
+    from rucio.common.types import InternalScope
     from rucio.rse import rsemanager
 
     if metacat_base is None:
@@ -30,13 +31,14 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     # check to see if PFN is already cached in Rucio's metadata system
     didclient = None
     didmd = {}
+    internal_scope = InternalScope(scope)
     if getattr(rsemanager, 'CLIENT_MODE', None):
         from rucio.client.didclient import DIDClient
         didclient = DIDClient()
-        didmd = didclient.get_metadata(scope, name)
+        didmd = didclient.get_metadata(internal_scope, name)
     if getattr(rsemanager, 'SERVER_MODE', None):
         from rucio.core.did import get_metadata
-        didmd = get_metadata(scope, name)
+        didmd = get_metadata(internal_scope, name)
 
     # if it is, just return it
     md_key = 'PFN_' + rse
@@ -44,7 +46,9 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
         return didmd[md_key]
 
     lfn = scope + ':' + name
-    f = urllib2.urlopen(metacat_base + "app/data/file?name=" + urllib2.quote(lfn, ''))
+    url = metacat_base + "app/data/file?name=" + lfn
+    #raise Exception('Trying to open URL ' + url)
+    f = urllib2.urlopen(url)
     jsondata = json.load(f)
     f.close()
 
@@ -58,8 +62,8 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
         timestamp = metadata['core.end_time']
     elif 'created_timestamp' in jsondata:
         timestamp = jsondata['created_timestamp']
-        if timestamp is None:
-            year = 'None'
+    if timestamp is None:
+        year = 'None'
     else:
         dt = datetime.utcfromtimestamp(timestamp)
         year = str(dt.year)
@@ -85,9 +89,9 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
 
     # store the PFN in Rucio metadata for next time
     if getattr(rsemanager, 'CLIENT_MODE', None):
-        didclient.set_metadata(scope, name, md_key, pfn)
+        didclient.set_metadata(internal_scope, name, md_key, pfn)
     if getattr(rsemanager, 'SERVER_MODE', None):
         from rucio.core.did import set_metadata
-        set_metadata(scope, name, md_key, pfn)
+        set_metadata(internal_scope, name, md_key, pfn)
 
     return pfn
