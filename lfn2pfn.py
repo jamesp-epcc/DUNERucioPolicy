@@ -17,12 +17,15 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     from rucio.common import config
     from rucio.common.types import InternalScope
     from rucio.rse import rsemanager
+    from metacat.webapi import MetaCatClient
 
-    if metacat_base is None:
-        metacat_base = config.config_get('policy', 'metacat_base_url')
-        if metacat_base is None:
-            metacat_base = 'https://dbdata0vm.fnal.gov:9443/dune_meta_demo/'
-        
+    # current URL: https://metacat.fnal.gov:9443/dune_meta_demo/app
+    metacat_url = config.config_get('policy', 'metacat_base_url') or os.environ.get("METACAT_SERVER_URL")
+    if metacat_url is None:
+        raise ValueError("MetaCat client URL is not configured")
+
+    metacat_client = MetaCatClient(metacat_url)
+
     def get_metadata_field(metadata, field):
         if field in metadata:
             return metadata[field]
@@ -46,13 +49,8 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
         return didmd[md_key]
 
     lfn = scope + ':' + name
-    url = metacat_base + "app/data/file?name=" + lfn
-    #raise Exception('Trying to open URL ' + url)
-    f = urllib2.urlopen(url)
-    jsondata = json.load(f)
-    f.close()
-
-    metadata = jsondata['metadata']
+    jsondata = metacat_client.get_file(name=lfn)
+    metadata = info["metadata"]
 
     # determine year from timestamps
     timestamp = None
