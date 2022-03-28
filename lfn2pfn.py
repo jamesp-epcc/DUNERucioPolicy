@@ -6,7 +6,6 @@ try:
 except ImportError:
     # py2
     import urllib2
-import json
 from datetime import datetime
 
 metacat_base = None
@@ -50,7 +49,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
 
     lfn = scope + ':' + name
     jsondata = metacat_client.get_file(name=lfn)
-    metadata = info["metadata"]
+    metadata = jsondata["metadata"]
 
     # determine year from timestamps
     timestamp = None
