@@ -39,6 +39,12 @@ from rucio.db.sqla.constants import IdentityType
 
 import rucio.core.permission.generic
 
+import os
+from metacat.webapi import MetaCatClient
+
+metacat_client = MetaCatClient(os.environ["METACAT_SERVER_URL"])
+
+
 def has_permission(issuer, action, kwargs, session=None):
     """
     Checks if an account has the specified permission to
@@ -178,6 +184,13 @@ def perm_add_subscription(issuer, kwargs, session=None):
     return False
 
 
+def _files_exist(lst):
+    names = set(item["scope"]+":"+item["name"] for item in lst)    
+    files = metacat_client.get_files([{"name":n} for n in names])
+    existing = set(f["name"] for f in files)
+    return not (names - existing)
+
+
 def perm_add_did(issuer, kwargs, session=None):
     """
     Checks if an account can add an data identifier to a scope.
@@ -187,6 +200,10 @@ def perm_add_did(issuer, kwargs, session=None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
+
+    if not _files_exist([kwargs]):
+        return False
+    
     # Check the accounts of the issued rules
     if not _is_root(issuer) and not has_account_attribute(account=issuer, key='admin', session=session):
         for rule in kwargs.get('rules', []):
@@ -209,6 +226,10 @@ def perm_add_dids(issuer, kwargs, session=None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
+
+    if not _files_exist(kwargs["dids"]):
+        return False
+    
     # Check the accounts of the issued rules
     if not _is_root(issuer) and not has_account_attribute(account=issuer, key='admin', session=session):
         for did in kwargs['dids']:
