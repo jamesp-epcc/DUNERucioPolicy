@@ -42,7 +42,7 @@ import rucio.core.permission.generic
 import os
 from metacat.webapi import MetaCatClient
 
-metacat_client = MetaCatClient(os.environ["METACAT_SERVER_URL"])
+metacat_client = MetaCatClient()				# will read env. METACAT_SERVER_URL by default
 
 
 def has_permission(issuer, action, kwargs, session=None):
@@ -185,10 +185,9 @@ def perm_add_subscription(issuer, kwargs, session=None):
 
 
 def _files_exist(lst):
-    names = set(item["scope"]+":"+item["name"] for item in lst)    
-    files = metacat_client.get_files([{"name":n} for n in names])
-    existing = set(f["name"] for f in files)
-    return not (names - existing)
+    dids = set(item["scope"]+":"+item["name"] for item in lst)    
+    files = metacat_client.get_files([{"did":did} for did in dids])
+    return len(files) == len(dids)
 
 
 def perm_add_did(issuer, kwargs, session=None):
