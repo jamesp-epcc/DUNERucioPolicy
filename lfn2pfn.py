@@ -1,11 +1,5 @@
 #!/usr/bin/env python
 
-try:
-    # py3
-    import urllib.request as urllib2
-except ImportError:
-    # py2
-    import urllib2
 from datetime import datetime
 
 metacat_base = None
