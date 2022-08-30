@@ -41,8 +41,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     if md_key in didmd:
         return didmd[md_key]
 
-    lfn = scope + ':' + name
-    jsondata = metacat_client.get_file(name=lfn)
+    jsondata = metacat_client.get_file(name=name, namespace=scope)
     metadata = jsondata["metadata"]
 
     # determine year from timestamps
