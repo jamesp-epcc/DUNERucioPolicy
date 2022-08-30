@@ -8,7 +8,7 @@ from datetime import datetime
 sam_base = None
 
 
-def construct_surl_dune_sam(dsn, name):
+def construct_surl_dune_sam(dsn, scope, name):
     global sam_base
 
     if sam_base is None:
@@ -35,7 +35,7 @@ def construct_surl_dune_sam(dsn, name):
     return destination
 
 
-def construct_surl_dune_metacat(dsn, name):
+def construct_surl_dune_metacat(dsn, scope, name):
     from metacat.webapi import MetaCatClient
 
     # current URL: https://metacat.fnal.gov:9443/dune_meta_demo/app
@@ -50,10 +50,7 @@ def construct_surl_dune_metacat(dsn, name):
             return metadata[field]
         return 'None'
 
-    #lfn = scope + ':' + name
-    # FIXME: check this is correct
-    lfn = name
-    jsondata = metacat_client.get_file(name=lfn)
+    jsondata = metacat_client.get_file(name=name, namespace=scope)
     metadata = jsondata["metadata"]
 
     # determine year from timestamps
