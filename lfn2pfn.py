@@ -75,7 +75,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     data_campaign = get_metadata_field(metadata, 'DUNE.campaign')
     filename = name
     
-    pfn = 'pnfs/dune/tape_backed/dunepro/' + run_type + '/' + data_tier + '/' + year + '/' + file_type + '/' + data_stream + '/' + data_campaign + '/' + hash1 + '/' + hash2 + '/' + hash3 + '/' + hash4 + '/' + filename
+    pfn = run_type + '/' + data_tier + '/' + year + '/' + file_type + '/' + data_stream + '/' + data_campaign + '/' + hash1 + '/' + hash2 + '/' + hash3 + '/' + hash4 + '/' + filename
 
     # store the PFN in Rucio metadata for next time
     if getattr(rsemanager, 'CLIENT_MODE', None):
