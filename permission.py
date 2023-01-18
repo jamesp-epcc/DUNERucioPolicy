@@ -186,7 +186,7 @@ def perm_add_subscription(issuer, kwargs, session=None):
 
 def _files_exist(lst):
     names = set(item["scope"].external+":"+item["name"] for item in lst)    
-    files = metacat_client.get_files([{"name":n} for n in names])
+    files = metacat_client.get_files([{"did":n} for n in names])
     existing = set(f["name"] for f in files)
     return not (names - existing)
 
