@@ -200,9 +200,9 @@ def perm_add_did(issuer, kwargs, session=None):
     :returns: True if account is allowed, otherwise False
     """
 
-    if not _files_exist([kwargs]):
-        return False
-    
+    if kwargs["type"] == "FILE" and not _files_exist([kwargs]):
+            return False
+
     # Check the accounts of the issued rules
     if not _is_root(issuer) and not has_account_attribute(account=issuer, key='admin', session=session):
         for rule in kwargs.get('rules', []):
