@@ -42,7 +42,7 @@ import rucio.core.permission.generic
 import os
 from metacat.webapi import MetaCatClient
 
-metacat_client = MetaCatClient(os.environ["METACAT_SERVER_URL"])
+metacat_client = MetaCatClient()				# will read env. METACAT_SERVER_URL by default
 
 
 def has_permission(issuer, action, kwargs, session=None):
@@ -185,10 +185,9 @@ def perm_add_subscription(issuer, kwargs, session=None):
 
 
 def _files_exist(lst):
-    names = set(item["scope"].external+":"+item["name"] for item in lst)    
-    files = metacat_client.get_files([{"did":n} for n in names])
-    existing = set(f["name"] for f in files)
-    return not (names - existing)
+    dids = set(item["scope"].external+":"+item["name"] for item in lst)    
+    files = metacat_client.get_files([{"did":did} for did in dids])
+    return len(files) == len(dids)
 
 
 def perm_add_did(issuer, kwargs, session=None):
@@ -201,9 +200,9 @@ def perm_add_did(issuer, kwargs, session=None):
     :returns: True if account is allowed, otherwise False
     """
 
-    if not _files_exist([kwargs]):
+    if kwargs["type"] == "FILE" and not _files_exist([kwargs]):
         return False
-    
+
     # Check the accounts of the issued rules
     if not _is_root(issuer) and not has_account_attribute(account=issuer, key='admin', session=session):
         for rule in kwargs.get('rules', []):
@@ -226,8 +225,10 @@ def perm_add_dids(issuer, kwargs, session=None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
+    
+    files = [did for did in kwargs if did.get("type") in ("F", "FILE")]
 
-    if not _files_exist(kwargs["dids"]):
+    if files and not _files_exist(files):
         return False
     
     # Check the accounts of the issued rules
