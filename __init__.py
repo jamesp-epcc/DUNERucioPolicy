@@ -1,7 +1,8 @@
-from .path_gen import construct_surl_dune
+from .path_gen import construct_surl_dune_sam, construct_surl_dune_metacat
 from .lfn2pfn import lfn2pfn_DUNE
 
-SUPPORTED_VERSION="1.20.7"
+SUPPORTED_VERSION="1.28.0"
 
 def get_algorithms():
-    return { 'lfn2pfn': { 'DUNE': lfn2pfn_DUNE }, 'surl': { 'DUNE': construct_surl_dune } }
+    return { 'lfn2pfn': { 'DUNE': lfn2pfn_DUNE }, 'surl': { 'DUNE_sam': construct_surl_dune_sam,
+                                                            'DUNE_metacat': construct_surl_dune_metacat } }

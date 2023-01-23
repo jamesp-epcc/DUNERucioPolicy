@@ -1,11 +1,5 @@
 #!/usr/bin/env python
 
-try:
-    # py3
-    import urllib.request as urllib2
-except ImportError:
-    # py2
-    import urllib2
 from datetime import datetime
 
 metacat_base = None
@@ -47,8 +41,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     if md_key in didmd:
         return didmd[md_key]
 
-    lfn = scope + ':' + name
-    jsondata = metacat_client.get_file(name=lfn)
+    jsondata = metacat_client.get_file(name=name, namespace=scope)
     metadata = jsondata["metadata"]
 
     # determine year from timestamps
@@ -82,7 +75,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     data_campaign = get_metadata_field(metadata, 'DUNE.campaign')
     filename = name
     
-    pfn = 'pnfs/dune/tape_backed/dunepro/' + run_type + '/' + data_tier + '/' + year + '/' + file_type + '/' + data_stream + '/' + data_campaign + '/' + hash1 + '/' + hash2 + '/' + hash3 + '/' + hash4 + '/' + filename
+    pfn = run_type + '/' + data_tier + '/' + year + '/' + file_type + '/' + data_stream + '/' + data_campaign + '/' + hash1 + '/' + hash2 + '/' + hash3 + '/' + hash4 + '/' + filename
 
     # store the PFN in Rucio metadata for next time
     if getattr(rsemanager, 'CLIENT_MODE', None):
