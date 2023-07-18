@@ -22,6 +22,8 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     def get_metadata_field(metadata, field):
         if field in metadata:
             return metadata[field]
+        if field.lower() in metadata:
+            return metadata[field.lower()]
         return 'None'
 
     # check to see if PFN is already cached in Rucio's metadata system

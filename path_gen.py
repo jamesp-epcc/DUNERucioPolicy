@@ -48,6 +48,8 @@ def construct_surl_dune_metacat(dsn, scope, name):
     def get_metadata_field(metadata, field):
         if field in metadata:
             return metadata[field]
+        if field.lower() in metadata:
+            return metadata[field.lower()]
         return 'None'
 
     jsondata = metacat_client.get_file(name=name, namespace=scope)
