@@ -33,10 +33,17 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     if getattr(rsemanager, 'CLIENT_MODE', None):
         from rucio.client.didclient import DIDClient
         didclient = DIDClient()
-        didmd = didclient.get_metadata(internal_scope, name)
+        try:
+            # this may fail if DID not yet registered with Rucio
+            didmd = didclient.get_metadata(internal_scope, name)
+        except:
+            pass
     if getattr(rsemanager, 'SERVER_MODE', None):
         from rucio.core.did import get_metadata
-        didmd = get_metadata(internal_scope, name)
+        try:
+            didmd = get_metadata(internal_scope, name)
+        except:
+            pass
 
     # if it is, just return it
     md_key = 'PFN_' + rse
