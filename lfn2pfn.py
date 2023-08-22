@@ -88,9 +88,16 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
 
     # store the PFN in Rucio metadata for next time
     if getattr(rsemanager, 'CLIENT_MODE', None):
-        didclient.set_metadata(internal_scope, name, md_key, pfn)
+        # again this may fail if DID not registered yet
+        try:
+            didclient.set_metadata(internal_scope, name, md_key, pfn)
+        except:
+            pass
     if getattr(rsemanager, 'SERVER_MODE', None):
         from rucio.core.did import set_metadata
-        set_metadata(internal_scope, name, md_key, pfn)
+        try:
+            set_metadata(internal_scope, name, md_key, pfn)
+        except:
+            pass
 
     return pfn
