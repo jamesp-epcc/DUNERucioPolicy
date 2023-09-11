@@ -103,7 +103,7 @@ def has_permission(issuer, action, kwargs, session=None):
             'access_rule_vo': perm_access_rule_vo}
 
     if action not in perm:
-        return rucio.core.permission.generic.has_permission(issuer, action, kwargs, session)
+        return rucio.core.permission.generic.has_permission(issuer, action, kwargs, session=session)
 
     return perm.get(action, perm_default)(issuer=issuer, kwargs=kwargs, session=session)
 
@@ -190,6 +190,10 @@ def _files_exist(lst):
     return len(files) == len(dids)
 
 
+def _dataset_exists(dataset):
+    return metacat_client.get_dataset(did=dataset["scope"].external+":"+dataset["name"]) is not None
+
+
 def perm_add_did(issuer, kwargs, session=None):
     """
     Checks if an account can add an data identifier to a scope.
@@ -201,6 +205,9 @@ def perm_add_did(issuer, kwargs, session=None):
     """
 
     if kwargs["type"] == "FILE" and not _files_exist([kwargs]):
+        return False
+
+    if (kwargs["type"] == "DATASET" or kwargs["type"] == "CONTAINER") and not _dataset_exists(kwargs):
         return False
 
     # Check the accounts of the issued rules
