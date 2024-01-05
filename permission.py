@@ -220,7 +220,7 @@ def perm_add_did(issuer, kwargs, session=None):
         or has_account_attribute(account=issuer, key='admin', session=session)\
         or has_account_attribute(account=issuer, key='add_did', session=session)\
         or rucio.core.scope.is_scope_owner(scope=kwargs['scope'], account=issuer, session=session)\
-        or kwargs['scope'].external == u'mock'
+        or kwargs['scope'].external == 'mock'
 
 
 def perm_add_dids(issuer, kwargs, session=None):
