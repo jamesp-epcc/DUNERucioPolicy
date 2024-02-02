@@ -157,7 +157,7 @@ def perm_add_rse(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='add_rse', session=session)
 
 
 def perm_update_rse(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -183,7 +183,10 @@ def perm_add_rule(issuer, kwargs, *, session: "Optional[Session]" = None):
     """
     if kwargs['account'] == issuer and not kwargs['locked']:
         return True
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer) or
+        has_account_attribute(account=issuer, key='admin', session=session) or
+        has_account_attribute(account=issuer, key='add_rule', session=session)
+    ):
         return True
     return False
 
@@ -197,7 +200,10 @@ def perm_add_subscription(issuer, kwargs, *, session: "Optional[Session]" = None
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer) or
+        has_account_attribute(account=issuer, key='admin', session=session) or
+        has_account_attribute(account=issuer, key='add_subscription', session=session)
+    ):
         return True
     return False
 
@@ -211,7 +217,7 @@ def perm_add_rse_attribute(issuer, kwargs, *, session: "Optional[Session]" = Non
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='add_rse_attribute', session=session):
         return True
     return False
 
@@ -225,7 +231,7 @@ def perm_del_rse_attribute(issuer, kwargs, *, session: "Optional[Session]" = Non
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='del_rse_attribute', session=session):
         return True
     return False
 
@@ -239,7 +245,7 @@ def perm_del_rse(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='del_rse', session=session)
 
 
 def perm_add_account(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -287,7 +293,7 @@ def perm_add_scope(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='add_scope', session=session)
 
 
 def perm_get_auth_token_user_pass(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -419,6 +425,7 @@ def perm_add_did(issuer, kwargs, *, session: "Optional[Session]" = None):
 
     return _is_root(issuer)\
         or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='add_did', session=session)\
         or rucio.core.scope.is_scope_owner(scope=kwargs['scope'], account=issuer, session=session)\
         or kwargs['scope'].external == 'mock'
 
@@ -445,7 +452,9 @@ def perm_add_dids(issuer, kwargs, *, session: "Optional[Session]" = None):
                 if rule['account'] != issuer:
                     return False
 
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) \
+        or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='add_dids', session=session)
 
 
 def perm_attach_dids(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -459,6 +468,7 @@ def perm_attach_dids(issuer, kwargs, *, session: "Optional[Session]" = None):
     """
     return _is_root(issuer)\
         or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='attach_dids', session=session)\
         or rucio.core.scope.is_scope_owner(scope=kwargs['scope'], account=issuer, session=session)\
         or kwargs['scope'].external == 'mock'
 
@@ -495,6 +505,7 @@ def perm_create_did_sample(issuer, kwargs, *, session: "Optional[Session]" = Non
     """
     return _is_root(issuer)\
         or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='create_did_sample', session=session)\
         or rucio.core.scope.is_scope_owner(scope=kwargs['scope'], account=issuer, session=session)\
         or kwargs['scope'].external == 'mock'
 
@@ -508,7 +519,10 @@ def perm_del_rule(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed to call the API call, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer)
+        or has_account_attribute(account=issuer, key='admin', session=session)
+        or has_account_attribute(account=issuer, key='del_rule', session=session)
+    ):
         return True
     return False
 
@@ -522,7 +536,10 @@ def perm_update_rule(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed to call the API call, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer)
+        or has_account_attribute(account=issuer, key='admin', session=session)
+        or has_account_attribute(account=issuer, key='update_rule', session=session)
+    ):
         return True
     return False
 
@@ -536,7 +553,10 @@ def perm_approve_rule(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed to call the API call, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer)
+        or has_account_attribute(account=issuer, key='admin', session=session)
+        or has_account_attribute(account=issuer, key='approve_rule', session=session)
+    ):
         return True
     return False
 
@@ -550,7 +570,10 @@ def perm_reduce_rule(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed to call the API call, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer)
+        or has_account_attribute(account=issuer, key='admin', session=session)
+        or has_account_attribute(account=issuer, key='reduce_rule', session=session)
+    ):
         return True
     return False
 
@@ -564,7 +587,10 @@ def perm_move_rule(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns:        True if account is allowed to call the API call, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer)
+        or has_account_attribute(account=issuer, key='admin', session=session)
+        or has_account_attribute(account=issuer, key='move_rule', session=session)
+    ):
         return True
     return False
 
@@ -578,7 +604,10 @@ def perm_update_subscription(issuer, kwargs, *, session: "Optional[Session]" = N
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer)
+        or has_account_attribute(account=issuer, key='admin', session=session)
+        or has_account_attribute(account=issuer, key='update_subscription', session=session)
+    ):
         return True
 
     return False
@@ -645,7 +674,7 @@ def perm_add_protocol(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='add_protocol', session=session)
 
 
 def perm_del_protocol(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -657,7 +686,7 @@ def perm_del_protocol(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='add_protocol', session=session)
 
 
 def perm_update_protocol(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -669,7 +698,7 @@ def perm_update_protocol(issuer, kwargs, *, session: "Optional[Session]" = None)
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='add_protocol', session=session)
 
 
 def perm_add_qos_policy(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -705,7 +734,7 @@ def perm_declare_bad_file_replicas(issuer, kwargs, *, session: "Optional[Session
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='declare_bad_file_replicas', session=session)
 
 
 def perm_declare_suspicious_file_replicas(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -771,7 +800,9 @@ def perm_update_replicas_states(issuer, kwargs, *, session: "Optional[Session]" 
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer)\
+        or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='update_replicas_states', session=session)
 
 
 def perm_queue_requests(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -783,7 +814,7 @@ def perm_queue_requests(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='queue_requests', session=session)
 
 
 def perm_list_requests(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -843,7 +874,7 @@ def perm_cancel_request(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='cancel_request', session=session)
 
 
 def perm_get_next(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -855,7 +886,7 @@ def perm_get_next(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='get_next', session=session)
 
 
 def perm_set_rse_usage(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -867,7 +898,7 @@ def perm_set_rse_usage(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed to call the API call, otherwise False
     """
-    return _is_root(issuer)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='set_rse_usage', session=session)
 
 
 def perm_set_rse_limits(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -879,7 +910,7 @@ def perm_set_rse_limits(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed to call the API call, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='set_rse_limits', session=session)
 
 
 def perm_set_local_account_limit(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -891,7 +922,7 @@ def perm_set_local_account_limit(issuer, kwargs, *, session: "Optional[Session]"
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='set_local_account_limit', session=session):
         return True
     # Check if user is a country admin
     admin_in_country = []
@@ -912,7 +943,7 @@ def perm_set_global_account_limit(issuer, kwargs, *, session: "Optional[Session]
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='set_global_account_limit', session=session):
         return True
     # Check if user is a country admin
     admin_in_country = set()
@@ -935,7 +966,7 @@ def perm_delete_local_account_limit(issuer, kwargs, *, session: "Optional[Sessio
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='delete_local_account_limit', session=session):
         return True
     # Check if user is a country admin
     admin_in_country = []
@@ -956,7 +987,7 @@ def perm_delete_global_account_limit(issuer, kwargs, *, session: "Optional[Sessi
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or has_account_attribute(account=issuer, key='delete_global_account_limit', session=session):
         return True
     # Check if user is a country admin
     admin_in_country = set()
@@ -992,7 +1023,8 @@ def perm_get_local_account_usage(issuer, kwargs, *, session: "Optional[Session]"
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or kwargs.get('account') == issuer:
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)\
+        or kwargs.get('account') == issuer or has_account_attribute(account=issuer, key='get_local_account_usage', session=session):
         return True
     # Check if user is a country admin
     for kv in list_account_attributes(account=issuer, session=session):
@@ -1010,7 +1042,8 @@ def perm_get_global_account_usage(issuer, kwargs, *, session: "Optional[Session]
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session) or kwargs.get('account') == issuer:
+    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)\
+        or kwargs.get('account') == issuer or has_account_attribute(account=issuer, key='get_global_account_usage', session=session):
         return True
 
     # Check if user is a country admin for all involved countries
@@ -1065,7 +1098,9 @@ def perm_resurrect(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed to call the API call, otherwise False
     """
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer)\
+        or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='resurrect', session=session)
 
 
 def perm_update_lifetime_exceptions(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -1080,7 +1115,9 @@ def perm_update_lifetime_exceptions(issuer, kwargs, *, session: "Optional[Sessio
         exceptions = next(list_exceptions(exception_id=kwargs['exception_id'], states=False, session=session))
         if exceptions['scope'].vo != kwargs['vo']:
             return False
-    return _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session)
+    return _is_root(issuer)\
+        or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='update_lifetime_exceptions', session=session)
 
 
 def perm_get_auth_token_ssh(issuer: "InternalAccount", kwargs: dict, *, session: "Optional[Session]" = None) -> bool:
@@ -1114,7 +1151,7 @@ def perm_add_bad_pfns(issuer, kwargs, *, session: "Optional[Session]" = None):
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    return _is_root(issuer)
+    return _is_root(issuer) or has_account_attribute(account=issuer, key='add_bad_pfns', session=session)
 
 
 def perm_remove_did_from_followed(issuer, kwargs, *, session: "Optional[Session]" = None):
@@ -1128,6 +1165,7 @@ def perm_remove_did_from_followed(issuer, kwargs, *, session: "Optional[Session]
     """
     return _is_root(issuer)\
         or has_account_attribute(account=issuer, key='admin', session=session)\
+        or has_account_attribute(account=issuer, key='remove_did_from_followed', session=session)\
         or kwargs['account'] == issuer\
         or kwargs['scope'].external == 'mock'
 
@@ -1141,7 +1179,10 @@ def perm_remove_dids_from_followed(issuer, kwargs, *, session: "Optional[Session
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    if _is_root(issuer) or has_account_attribute(account=issuer, key='admin', session=session):
+    if (_is_root(issuer)
+        or has_account_attribute(account=issuer, key='admin', session=session)
+        or has_account_attribute(account=issuer, key='remove_dids_from_followed', session=session)
+    ):
         return True
     if not kwargs['account'] == issuer:
         return False
