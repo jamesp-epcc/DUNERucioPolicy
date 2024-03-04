@@ -3,7 +3,7 @@ import urllib
 from rucio.common import config
 from rucio.common.exception import ServiceUnavailable
 from datetime import datetime
-
+import os
 
 sam_base = None
 
