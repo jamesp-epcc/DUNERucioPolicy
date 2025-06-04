@@ -1,8 +1,9 @@
+from .utils import get_year_from_metadata
+
 import requests
 import urllib
 from rucio.common import config
 from rucio.common.exception import ServiceUnavailable
-from datetime import datetime
 import os
 
 sam_base = None
@@ -56,18 +57,7 @@ def construct_surl_dune_metacat(dsn, scope, name):
     metadata = jsondata["metadata"]
 
     # determine year from timestamps
-    timestamp = None
-    if 'core.start_time' in metadata:
-        timestamp = metadata['core.start_time']
-    elif 'core.end_time' in metadata:
-        timestamp = metadata['core.end_time']
-    elif 'created_timestamp' in jsondata:
-        timestamp = jsondata['created_timestamp']
-    if timestamp is None:
-        year = 'None'
-    else:
-        dt = datetime.utcfromtimestamp(timestamp)
-        year = str(dt.year)
+    year = get_year_from_metadata(jsondata)
 
     # determine hashes from run number
     run_number = 0

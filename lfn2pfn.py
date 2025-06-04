@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from datetime import datetime
+from .utils import get_year_from_metadata
+
 import os
 
 metacat_base = None
@@ -55,18 +56,7 @@ def lfn2pfn_DUNE(scope, name, rse, rse_attrs, protocol_attrs):
     metadata = jsondata["metadata"]
 
     # determine year from timestamps
-    timestamp = None
-    if 'core.start_time' in metadata:
-        timestamp = metadata['core.start_time']
-    elif 'core.end_time' in metadata:
-        timestamp = metadata['core.end_time']
-    elif 'created_timestamp' in jsondata:
-        timestamp = jsondata['created_timestamp']
-    if timestamp is None:
-        year = 'None'
-    else:
-        dt = datetime.utcfromtimestamp(timestamp)
-        year = str(dt.year)
+    year = get_year_from_metadata(jsondata)
 
     # determine hashes from run number
     run_number = 0
