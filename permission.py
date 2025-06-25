@@ -401,7 +401,7 @@ def _files_exist(lst):
 
 @func_tools.lru_cache(maxsize=512)
 def _cached_get_dataset(did):
-    return metacat_client.get_dataset(did) is not None
+    return metacat_client.get_dataset(did)
       
 def _dataset_exists(dataset):
     return _cached_get_dataset(did=dataset["scope"].external+":"+dataset["name"]) is not None
