@@ -4,5 +4,5 @@ from .lfn2pfn import lfn2pfn_DUNE
 SUPPORTED_VERSION=[">=36.0"]
 
 def get_algorithms():
-    return { 'lfn2pfn': { 'DUNE': lfn2pfn_DUNE }, 'surl': { 'DUNE_sam': construct_surl_dune_sam,
-                                                            'DUNE_metacat': construct_surl_dune_metacat } }
+    return { 'lfn2pfn': { 'DUNE': lfn2pfn_DUNE }, 'non_deterministic_pfn': { 'DUNE_sam': construct_surl_dune_sam,
+                                                                             'DUNE_metacat': construct_surl_dune_metacat } }
