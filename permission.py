@@ -23,6 +23,7 @@ from rucio.core.lifetime_exception import list_exceptions
 from rucio.core.rse import list_rse_attributes
 from rucio.core.rse_expression_parser import parse_expression
 from rucio.db.sqla.constants import IdentityType
+import functools
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -398,8 +399,12 @@ def _files_exist(lst):
     return len(files) == len(dids)
 
 
+@func_tools.lru_cache(maxsize=512)
+def _cached_get_dataset(did):
+    return metacat_client.get_dataset(did)
+      
 def _dataset_exists(dataset):
-    return metacat_client.get_dataset(did=dataset["scope"].external+":"+dataset["name"]) is not None
+    return _cached_get_dataset(did=dataset["scope"].external+":"+dataset["name"]) is not None
 
 
 def perm_add_did(issuer: "InternalAccount", kwargs: dict[str, Any], *, session: "Optional[Session]" = None) -> bool:
