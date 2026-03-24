@@ -22,7 +22,7 @@ from rucio.core.identity import exist_identity_account
 from rucio.core.lifetime_exception import list_exceptions
 from rucio.core.rse import list_rse_attributes
 from rucio.core.rse_expression_parser import parse_expression
-from rucio.db.sqla.constants import IdentityType
+from rucio.db.sqla.constants import DIDType, IdentityType
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -393,7 +393,7 @@ def perm_del_identity(issuer: "InternalAccount", kwargs: dict[str, Any], *, sess
 
 
 def _files_exist(lst):
-    dids = set(item["scope"].external+":"+item["name"] for item in lst)    
+    dids = set(item["scope"].external+":"+item["name"] for item in lst)
     files = metacat_client.get_files([{"did":did} for did in dids])
     return len(files) == len(dids)
 
@@ -412,10 +412,10 @@ def perm_add_did(issuer: "InternalAccount", kwargs: dict[str, Any], *, session: 
     :returns: True if account is allowed, otherwise False
     """
 
-    if kwargs["type"] == "FILE" and not _files_exist([kwargs]):
+    if kwargs["type"] == DIDType.FILE and not _files_exist([kwargs]):
         return False
 
-    if (kwargs["type"] == "DATASET" or kwargs["type"] == "CONTAINER") and not _dataset_exists(kwargs):
+    if (kwargs["type"] == DIDType.DATASET or kwargs["type"] == DIDType.CONTAINER) and not _dataset_exists(kwargs):
         return False
 
     # Check the accounts of the issued rules
@@ -440,8 +440,8 @@ def perm_add_dids(issuer: "InternalAccount", kwargs: dict[str, Any], *, session:
     :param session: The DB session to use
     :returns: True if account is allowed, otherwise False
     """
-    
-    files = [did for did in kwargs if did.get("type") in ("F", "FILE")]
+
+    files = [did for did in kwargs["dids"] if did.get("type") in ("F", "FILE", DIDType.FILE)]
 
     if files and not _files_exist(files):
         return False
