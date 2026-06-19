@@ -14,26 +14,16 @@ jobs:
         with:
           repository: rucio/rucio
           path: rucio
-      - name: Check file system layout
+      - name: Add MetaCat container
         shell: bash
         run: |
-          # This echoes /home/runner/work/DUNERucioPolicy/DUNERucioPolicy
-          echo $GITHUB_WORKSPACE
-
-          # We're in $GITHUB_WORKSPACE here
-          pwd
-
-          # This lists the files that are part of the policy package repo
-          # i.e. it's as if the checkout was run at /home/runner/work/DUNERucioPolicy
-          echo "Contents of workspace:"
-          ls
-          echo "Contents of DUNERucioPolicy:"
-          ls DUNERucioPolicy
-          echo "Contents of rucio:"
-          ls rucio
-      - name: Check that we have docker-compose
-        shell: bash
-        run: docker compose
+          COMPOSE_FILENAME=$GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml
+          echo '  metacat:' >> $COMPOSE_FILENAME
+          echo '    image: docker.io/jamespepcc/metacat_test' >> $COMPOSE_FILENAME
+          echo '    ports:' >> $COMPOSE_FILENAME
+          echo '      - "127.0.0.1:8000:8080"' >> $COMPOSE_FILENAME
+          echo 'Modified compose file:'
+          cat $COMPOSE_FILENAME
       - name: Start Rucio containers
         shell: bash
         run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage up -d
