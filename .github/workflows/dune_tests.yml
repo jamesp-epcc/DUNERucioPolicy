@@ -21,7 +21,7 @@ jobs:
           NEW_COMPOSE_FILENAME=docker-compose.yml
 
           # copy all the lines up to and including 'services:'
-          sed '/services:/q' $COMPOSE_FILENAME > NEW_COMPOSE_FILENAME
+          sed '/services:/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
 
           # add our MetaCat container lines
           echo '  metacat:' >> $NEW_COMPOSE_FILENAME
