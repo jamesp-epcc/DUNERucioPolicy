@@ -39,7 +39,7 @@ jobs:
         run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage up -d
       - name: Initialise tests in container
         shell: bash
-        run: docker exec -t dev_rucio_1 tools/run_tests.sh -ir
+        run: docker exec -t dev-rucio-1 tools/run_tests.sh -ir
       - name: Stop containers
         shell: bash
         run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage down
