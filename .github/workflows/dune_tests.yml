@@ -8,6 +8,7 @@ jobs:
       - name: Checkout DUNERucioPolicy
         uses: actions/checkout@v7
       - name: Check file system layout
+        shell: bash
         run: |
 	  echo $GITHUB_WORKSPACE
 	  pwd
