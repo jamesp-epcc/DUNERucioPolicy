@@ -7,6 +7,13 @@ jobs:
     steps:
       - name: Checkout DUNERucioPolicy
         uses: actions/checkout@v7
+        with:
+          path: DUNERucioPolicy
+      - name: Checkout Rucio
+        uses: actions/checkout@v7
+        with:
+          repository: rucio/rucio
+          path: rucio
       - name: Check file system layout
         shell: bash
         run: |
@@ -18,15 +25,12 @@ jobs:
 
           # This lists the files that are part of the policy package repo
           # i.e. it's as if the checkout was run at /home/runner/work/DUNERucioPolicy
+          echo "Contents of workspace:"
           ls
-      - name: Checkout Rucio
-        uses: actions/checkout@v7
-        with:
-          repository: rucio/rucio
-          path: /home/runner/work/DUNERucioPolicy/rucio
-      - name: Check that Rucio checked out as expected
-        shell: bash
-        run: ls /home/runner/work/DUNERucioPolicy/rucio
+          echo "Contents of DUNERucioPolicy:"
+	  ls DUNERucioPolicy
+          echo "Contents of rucio:"
+          ls rucio
       - name: Check that we have docker-compose
         shell: bash
         run: docker compose
