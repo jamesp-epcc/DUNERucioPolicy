@@ -35,14 +35,14 @@ jobs:
           # copy the new file over the old
           cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
 
-          # now copy all lines up to 'ruciodb:'
-          sed -n '/ruciodb:/q;p' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
+          # now copy all lines up to and including '- DEV_PROFILES'
+          sed '/- DEV_PROFILES/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
 
           # add MetaCat environment variable
           echo '      - METACAT_SERVER_URL=http://dev-metacat-1:8080/' >> $NEW_COMPOSE_FILENAME
 
-          # copy all the lines from 'ruciodb:' onwards
-          sed -ne '/ruciodb:/,$ p' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
+          # copy all the lines after '- DEV_PROFILES'
+          sed -e '1,/- DEV_PROFILES:/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
 
           # copy the new file over the old again
           cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
