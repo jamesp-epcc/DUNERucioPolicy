@@ -28,7 +28,7 @@ jobs:
           echo "Contents of workspace:"
           ls
           echo "Contents of DUNERucioPolicy:"
-	  ls DUNERucioPolicy
+          ls DUNERucioPolicy
           echo "Contents of rucio:"
           ls rucio
       - name: Check that we have docker-compose
