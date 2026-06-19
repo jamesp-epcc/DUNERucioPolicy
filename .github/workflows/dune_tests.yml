@@ -42,7 +42,7 @@ jobs:
           echo '      - METACAT_SERVER_URL=http://dev-metacat-1:8080/' >> $NEW_COMPOSE_FILENAME
 
           # copy all the lines after '- DEV_PROFILES'
-          sed -e '1,/- DEV_PROFILES:/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
+          sed -e '1,/- DEV_PROFILES/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
 
           # copy the new file over the old again
           cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
