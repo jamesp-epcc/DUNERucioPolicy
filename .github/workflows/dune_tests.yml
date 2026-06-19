@@ -40,6 +40,13 @@ jobs:
       - name: Start Rucio containers
         shell: bash
         run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage up -d
+      - name: Prepare MetaCat
+        shell: bash
+        run: |
+          cp $GITHUB_WORKSPACE/DUNERucioPolicy/test/dune_init_metacat.py $GITHUB_WORKSPACE/rucio/tests
+          chmod 755 $GITHUB_WORKSPACE/rucio/tests/dune_init_metacat.py
+          docker exec -t dev-rucio-1 pip install metacat
+          docker exec -t dev-rucio-1 python tests/dune_init_metacat.py
       - name: Initialise tests in container
         shell: bash
         run: docker exec -t dev-rucio-1 tools/run_tests.sh -ir
