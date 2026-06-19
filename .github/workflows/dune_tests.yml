@@ -1,0 +1,14 @@
+name: dune-tests
+run-name: DUNE Rucio tests
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout DUNERucioPolicy
+        uses: actions/checkout@v7
+      - name: Check file system layout
+        run:
+	  echo $GITHUB_WORKSPACE
+	  pwd
+	  ls
