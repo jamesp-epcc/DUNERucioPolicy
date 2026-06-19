@@ -57,7 +57,6 @@ jobs:
         shell: bash
         run: |
           cp $GITHUB_WORKSPACE/DUNERucioPolicy/test/dune_init_metacat.py $GITHUB_WORKSPACE/rucio/tests
-          chmod 755 $GITHUB_WORKSPACE/rucio/tests/dune_init_metacat.py
           docker exec -t dev-rucio-1 pip install metacat
           docker exec -t dev-rucio-1 python tests/dune_init_metacat.py
       - name: Install DUNE policy package
