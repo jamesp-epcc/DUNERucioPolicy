@@ -32,11 +32,24 @@ jobs:
           # copy all the lines after 'services:' from the original file
           sed -e '1,/services:/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
 
-          echo 'Modified compose file:'
-          cat $NEW_COMPOSE_FILENAME
-
-          # copy the new file into place
+          # copy the new file over the old
           cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
+
+          # now copy all lines up to 'ruciodb:'
+          sed -n '/ruciodb:/q;p' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
+
+          # add MetaCat environment variable
+          echo '      - METACAT_SERVER_URL=http://dev-metacat-1:8080/' >> $NEW_COMPOSE_FILENAME
+
+          # copy all the lines from 'ruciodb:' onwards
+          sed -ne '/ruciodb:/,$ p' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
+
+          # copy the new file over the old again
+          cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
+
+          # print out the new file contents for debugging
+          echo 'Modified compose file:'
+          cat $COMPOSE_FILENAME
       - name: Start Rucio containers
         shell: bash
         run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage up -d
