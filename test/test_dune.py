@@ -52,8 +52,8 @@ def get_metacat_client():
 class TestDUNEPolicyPackage(unittest.TestCase):
     def setUp(self):
         self.marker = '$ >'
-        #self.scope, self.rses = server_test.get_scope_and_rses()
-        #self.rse = self.rses[0]
+        self.scope, self.rses = server_test.get_scope_and_rses()
+        self.rse = self.rses[0]
         self.scope = 'test'
         self.rse = 'XRD1'
         self.generated_file_dids = []
