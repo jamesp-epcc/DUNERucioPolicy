@@ -1,6 +1,9 @@
 name: dune-tests
 run-name: DUNE Rucio tests
-on: [push]
+on:
+  - push
+  - schedule:
+      - cron '30 1 * * *'
 jobs:
   test:
     runs-on: ubuntu-latest
