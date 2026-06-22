@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           # use DUNE's policy package
-          docker exec -t dev-rucio-1 sed -i 's/package = atlas_rucio_policy_package/package = DUNERucioPolicy' /opt/rucio/etc/rucio.cfg
+          docker exec -t dev-rucio-1 sed -i 's/package = atlas_rucio_policy_package/package = DUNERucioPolicy/' /opt/rucio/etc/rucio.cfg
 
           # use DUNE's lfn2pfn algorithm by default
           docker exec -t dev-rucio-1 sed -i 's/lfn2pfn_algorithm_default = hash/lfn2pfn_algorithm_default = DUNE/' /opt/rucio/etc/rucio.cfg
