@@ -19,8 +19,8 @@ from os.path import basename
 import time
 import unittest
 
-from rucio.api.account import add_account, add_account_attribute, del_account
-from rucio.api.scope import add_scope
+from rucio.gateway.account import add_account, add_account_attribute, del_account
+from rucio.gateway.scope import add_scope
 from rucio.common.config import config_set
 from rucio.common.exception import AccessDenied
 import rucio.common.test_rucio_server as server_test
