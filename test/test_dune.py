@@ -52,8 +52,10 @@ def get_metacat_client():
 class TestDUNEPolicyPackage(unittest.TestCase):
     def setUp(self):
         self.marker = '$ >'
-        self.scope, self.rses = server_test.get_scope_and_rses()
-        self.rse = self.rses[0]
+        #self.scope, self.rses = server_test.get_scope_and_rses()
+        #self.rse = self.rses[0]
+        self.scope = 'test'
+        self.rse = 'XRD1'
         self.generated_file_dids = []
         self.generated_dataset_dids = []
 
@@ -334,7 +336,8 @@ def test_dune_replicate():
     # generate test file and test dataset name
     tmp_file1 = server_test.file_generator()
     tmp_dsn1 = 'tests.dune_replicate_dataset_' + uuid()
-    scope, rses = server_test.get_scope_and_rses()
+    #scope, rses = server_test.get_scope_and_rses()
+    scope = 'test'
 
     src_rse = 'XRD3'
     src_rse_id = rse_core.get_rse_id(rse=src_rse)
