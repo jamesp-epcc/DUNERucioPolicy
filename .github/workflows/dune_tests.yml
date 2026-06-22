@@ -20,29 +20,33 @@ jobs:
           COMPOSE_FILENAME=$GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml
           NEW_COMPOSE_FILENAME=docker-compose.yml
 
+          pip install pyyaml
+
+          python $GITHUB_WORKSPACE/DUNERucioPolicy/test/modify_docker_compose.py $COMPOSE_FILENAME $NEW_COMPOSE_FILENAME
+
           # copy all the lines up to and including 'services:'
-          sed '/services:/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
+          #sed '/services:/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
 
           # add our MetaCat container lines
-          echo '  metacat:' >> $NEW_COMPOSE_FILENAME
-          echo '    image: docker.io/jamespepcc/metacat_test' >> $NEW_COMPOSE_FILENAME
-          echo '    ports:' >> $NEW_COMPOSE_FILENAME
-          echo '      - "127.0.0.1:8000:8080"' >> $NEW_COMPOSE_FILENAME
+          #echo '  metacat:' >> $NEW_COMPOSE_FILENAME
+          #echo '    image: docker.io/jamespepcc/metacat_test' >> $NEW_COMPOSE_FILENAME
+          #echo '    ports:' >> $NEW_COMPOSE_FILENAME
+          #echo '      - "127.0.0.1:8000:8080"' >> $NEW_COMPOSE_FILENAME
 
           # copy all the lines after 'services:' from the original file
-          sed -e '1,/services:/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
+          #sed -e '1,/services:/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
 
           # copy the new file over the old
-          cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
+          #cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
 
           # now copy all lines up to and including '- DEV_PROFILES'
-          sed '/- DEV_PROFILES/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
+          #sed '/- DEV_PROFILES/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
 
           # add MetaCat environment variable
-          echo '      - METACAT_SERVER_URL=http://dev-metacat-1:8080/' >> $NEW_COMPOSE_FILENAME
+          #echo '      - METACAT_SERVER_URL=http://dev-metacat-1:8080/' >> $NEW_COMPOSE_FILENAME
 
           # copy all the lines after '- DEV_PROFILES'
-          sed -e '1,/- DEV_PROFILES/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
+          #sed -e '1,/- DEV_PROFILES/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
 
           # copy the new file over the old again
           cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
