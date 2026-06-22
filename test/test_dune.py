@@ -43,7 +43,7 @@ MAX_POLL_WAIT_SECONDS = 100
 # Connects to the test MetaCat container and logs in
 def get_metacat_client():
     from metacat.webapi import MetaCatClient
-    metacat_client = MetaCatClient("http://dev_metacat_1:8080/")
+    metacat_client = MetaCatClient("http://dev-metacat-1:8080/")
     metacat_client.login_password("admin", "admin")
     return metacat_client
 
