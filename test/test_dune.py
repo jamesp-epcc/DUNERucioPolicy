@@ -288,18 +288,18 @@ class TestDUNEPolicyPackage(unittest.TestCase):
         # remove file from MetaCat
         metacat_client.delete_file(did=file_did1)
 
-    def test_dune_surl(self):
-        """DUNE(SURL): test the DUNE SURL algorithm"""
-        # get the SURL function from the policy package
+    def test_dune_non_deterministic_pfn(self):
+        """DUNE(SURL): test the DUNE non-deterministic PFN algorithm"""
+        # get the non-deterministic PFN function from the policy package
         from DUNERucioPolicy import get_algorithms
         algorithms = get_algorithms()
-        self.assertTrue('surl' in algorithms)
-        self.assertTrue('DUNE_metacat' in algorithms['surl'])
-        surl_fn = algorithms['surl']['DUNE_metacat']
+        self.assertTrue('non_deterministic_pfn' in algorithms)
+        self.assertTrue('DUNE_metacat' in algorithms['non_deterministic_pfn'])
+        non_deterministic_pfn_fn = algorithms['non_deterministic_pfn']['DUNE_metacat']
 
         # generate a test file and test data set name
         tmp_file1 = server_test.file_generator()
-        tmp_dsn1 = 'tests.dune_surl_dataset_' + uuid()
+        tmp_dsn1 = 'tests.dune_non_deterministic_pfn_dataset_' + uuid()
 
         # declare file and dataset to MetaCat, including metadata
         metacat_client = get_metacat_client()
@@ -319,7 +319,7 @@ class TestDUNEPolicyPackage(unittest.TestCase):
                                     metadata=metadata)
 
         # get PFN for this file
-        pfn = surl_fn(tmp_dsn1, self.scope, basename(tmp_file1))
+        pfn = non_deterministic_pfn_fn(tmp_dsn1, self.scope, basename(tmp_file1))
 
         # check it's as expected
         self.assertEqual(pfn, "testrun/testtier/2024/randombytes/teststream/votests/12/34/56/78/" + basename(tmp_file1))
