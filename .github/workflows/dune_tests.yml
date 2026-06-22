@@ -61,6 +61,14 @@ jobs:
       - name: Initialise tests in container
         shell: bash
         run: docker exec -t dev-rucio-1 tools/run_tests.sh -ir
+      - name: Run DUNE-specific tests
+        shell: bash
+        run: |
+          # copy the DUNE tests into the Rucio container
+          docker cp $GITHUB_WORKSPACE/DUNERucioPolicy/test/test_dune.py dev-rucio-1:/opt/rucio/tests/test_dune.py
+
+          # run the tests
+          docker exec -t dev-rucio-1 tools/pytest.sh -v --tb=short tests/test_dune.py
       - name: Stop containers
         shell: bash
         run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage down
