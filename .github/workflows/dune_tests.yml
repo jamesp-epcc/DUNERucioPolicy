@@ -20,33 +20,11 @@ jobs:
           COMPOSE_FILENAME=$GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml
           NEW_COMPOSE_FILENAME=docker-compose.yml
 
+          # install dependency
           pip install pyyaml
 
+          # add MetaCat container and environment variable to Rucio's docker compose file
           python $GITHUB_WORKSPACE/DUNERucioPolicy/test/modify_docker_compose.py $COMPOSE_FILENAME $NEW_COMPOSE_FILENAME
-
-          # copy all the lines up to and including 'services:'
-          #sed '/services:/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
-
-          # add our MetaCat container lines
-          #echo '  metacat:' >> $NEW_COMPOSE_FILENAME
-          #echo '    image: docker.io/jamespepcc/metacat_test' >> $NEW_COMPOSE_FILENAME
-          #echo '    ports:' >> $NEW_COMPOSE_FILENAME
-          #echo '      - "127.0.0.1:8000:8080"' >> $NEW_COMPOSE_FILENAME
-
-          # copy all the lines after 'services:' from the original file
-          #sed -e '1,/services:/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
-
-          # copy the new file over the old
-          #cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
-
-          # now copy all lines up to and including '- DEV_PROFILES'
-          #sed '/- DEV_PROFILES/q' $COMPOSE_FILENAME > $NEW_COMPOSE_FILENAME
-
-          # add MetaCat environment variable
-          #echo '      - METACAT_SERVER_URL=http://dev-metacat-1:8080/' >> $NEW_COMPOSE_FILENAME
-
-          # copy all the lines after '- DEV_PROFILES'
-          #sed -e '1,/- DEV_PROFILES/ d' $COMPOSE_FILENAME >> $NEW_COMPOSE_FILENAME
 
           # copy the new file over the old again
           cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
@@ -66,6 +44,20 @@ jobs:
       - name: Install DUNE policy package
         shell: bash
         run: docker cp $GITHUB_WORKSPACE/DUNERucioPolicy dev-rucio-1:/usr/local/lib/python3.9/site-packages/DUNERucioPolicy
+      - name: Configure DUNE policy package
+        shell: bash
+        run: |
+          # use DUNE's policy package
+          docker exec -t dev-rucio-1 sed -i 's/package = atlas_rucio_policy_package/package = DUNERucioPolicy' /opt/rucio/etc/rucio.cfg
+
+          # use DUNE's lfn2pfn algorithm by default
+          docker exec -t dev-rucio-1 sed -i 's/lfn2pfn_algorithm_default = hash/lfn2pfn_algorithm_default = DUNE/' /opt/rucio/etc/rucio.cfg
+
+          echo 'Modified rucio.cfg:'
+          cat /opt/rucio/etc/rucio.cfg
+
+          # copy accounts config template
+          docker exec -t dev-rucio-1 cp etc/rse-accounts.cfg.template etc/rse-accounts.cfg
       - name: Initialise tests in container
         shell: bash
         run: docker exec -t dev-rucio-1 tools/run_tests.sh -ir
