@@ -37,7 +37,9 @@ jobs:
           cat $COMPOSE_FILENAME
       - name: Start Rucio containers
         shell: bash
-        run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage up -d
+        run: |
+          docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage up -d
+          docker images
       - name: Prepare MetaCat
         shell: bash
         run: |
