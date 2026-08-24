@@ -1,0 +1,79 @@
+name: dune-tests
+run-name: DUNE Rucio tests
+on:
+  push:
+  schedule:
+    - cron: '30 1 * * *'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout DUNERucioPolicy
+        uses: actions/checkout@v7
+        with:
+          path: DUNERucioPolicy
+      - name: Checkout Rucio
+        uses: actions/checkout@v7
+        with:
+          repository: rucio/rucio
+          path: rucio
+      - name: Add MetaCat container
+        shell: bash
+        run: |
+          COMPOSE_FILENAME=$GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml
+          NEW_COMPOSE_FILENAME=docker-compose.yml
+
+          # install dependency
+          pip install pyyaml
+
+          # add MetaCat container and environment variable to Rucio's docker compose file
+          python $GITHUB_WORKSPACE/DUNERucioPolicy/test/modify_docker_compose.py $COMPOSE_FILENAME $NEW_COMPOSE_FILENAME
+
+          # copy the new file over the old again
+          cp $NEW_COMPOSE_FILENAME $COMPOSE_FILENAME
+
+          # print out the new file contents for debugging
+          echo 'Modified compose file:'
+          cat $COMPOSE_FILENAME
+      - name: Start Rucio containers
+        shell: bash
+        run: |
+          docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage up -d
+          docker images
+      - name: Prepare MetaCat
+        shell: bash
+        run: |
+          cp $GITHUB_WORKSPACE/DUNERucioPolicy/test/dune_init_metacat.py $GITHUB_WORKSPACE/rucio/tests
+          docker exec -t dev-rucio-1 pip install metacat
+          docker exec -t dev-rucio-1 python tests/dune_init_metacat.py
+      - name: Install DUNE policy package
+        shell: bash
+        run: docker cp $GITHUB_WORKSPACE/DUNERucioPolicy dev-rucio-1:/usr/local/lib/python3.9/site-packages/DUNERucioPolicy
+      - name: Configure DUNE policy package
+        shell: bash
+        run: |
+          # use DUNE's policy package
+          docker exec -t dev-rucio-1 sed -i 's/package = atlas_rucio_policy_package/package = DUNERucioPolicy/' /opt/rucio/etc/rucio.cfg
+
+          # use DUNE's lfn2pfn algorithm by default
+          docker exec -t dev-rucio-1 sed -i 's/lfn2pfn_algorithm_default = hash/lfn2pfn_algorithm_default = DUNE/' /opt/rucio/etc/rucio.cfg
+
+          echo 'Modified rucio.cfg:'
+          docker exec -t dev-rucio-1 cat /opt/rucio/etc/rucio.cfg
+
+          # copy accounts config template
+          docker exec -t dev-rucio-1 cp etc/rse-accounts.cfg.template etc/rse-accounts.cfg
+      - name: Initialise tests in container
+        shell: bash
+        run: docker exec -t dev-rucio-1 tools/run_tests.sh -ir
+      - name: Run DUNE-specific tests
+        shell: bash
+        run: |
+          # copy the DUNE tests into the Rucio container
+          docker cp $GITHUB_WORKSPACE/DUNERucioPolicy/test/test_dune.py dev-rucio-1:/opt/rucio/tests/test_dune.py
+
+          # run the tests
+          docker exec -t dev-rucio-1 tools/pytest.sh -v --tb=short tests/test_dune.py
+      - name: Stop containers
+        shell: bash
+        run: docker compose -f $GITHUB_WORKSPACE/rucio/etc/docker/dev/docker-compose.yml --profile storage down
