@@ -399,7 +399,7 @@ def _files_exist(lst):
     return len(files) == len(dids)
 
 
-@func_tools.lru_cache(maxsize=512)
+@functools.lru_cache(maxsize=512)
 def _cached_get_dataset(did):
     return metacat_client.get_dataset(did)
       
