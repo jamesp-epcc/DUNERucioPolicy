@@ -23,7 +23,7 @@ from rucio.gateway.account import add_account, add_account_attribute, del_accoun
 from rucio.gateway.scope import add_scope
 from rucio.common.config import config_set
 from rucio.common.exception import AccessDenied
-import rucio.common.test_rucio_server as server_test
+import test_rucio_server as server_test
 from rucio.common.types import InternalAccount, InternalScope
 from rucio.common.utils import generate_uuid as uuid, execute
 from rucio.core import replica as replica_core
@@ -71,14 +71,14 @@ class TestDUNEPolicyPackage(unittest.TestCase):
         self.generated_dataset_dids = []
 
     @pytest.mark.xfail(reason="Rucio bug appears to be preventing permission check from working")
-    def test_dataset_permissions(self):
+    def test_dataset_permissions(self, file_factory):
         """DUNE(PERMISSION): rucio upload dataset with and without MetaCat entries"""
         if self.rse is None:
             return
 
-        tmp_file1 = server_test.file_generator()
-        tmp_file2 = server_test.file_generator()
-        tmp_file3 = server_test.file_generator()
+        tmp_file1 = file_factory.file_generator()
+        tmp_file2 = file_factory.file_generator()
+        tmp_file3 = file_factory.file_generator()
         tmp_dsn1 = 'tests.dune_permission_dataset_' + uuid()
         tmp_dsn2 = 'tests.dune_permission_dataset_' + uuid()
 
@@ -154,14 +154,14 @@ class TestDUNEPolicyPackage(unittest.TestCase):
         self.generated_dataset_dids += [ dataset_did1, dataset_did2 ]
 
     @pytest.mark.xfail(reason="permission check is bypassed when creating file DIDs due to Rucio bug")
-    def test_file_permissions(self):
+    def test_file_permissions(self, file_factory):
         """DUNE(PERMISSION): rucio upload files with and without MetaCat entries"""
         if self.rse is None:
             return
 
-        tmp_file1 = server_test.file_generator()
-        tmp_file2 = server_test.file_generator()
-        tmp_file3 = server_test.file_generator()
+        tmp_file1 = file_factory.file_generator()
+        tmp_file2 = file_factory.file_generator()
+        tmp_file3 = file_factory.file_generator()
         tmp_dsn = 'tests.dune_permission_dataset_' + uuid()
 
         # Add dataset to MetaCat, but not files yet
@@ -250,7 +250,7 @@ class TestDUNEPolicyPackage(unittest.TestCase):
         # clean up the account
         del_account(username, 'root')
         
-    def test_dune_lfn2pfn(self):
+    def test_dune_lfn2pfn(self, file_factory):
         """DUNE(LFN2PFN): test the DUNE lfn2pfn algorithm"""
         # get the LFN2PFN function from the policy package
         from DUNERucioPolicy import get_algorithms
@@ -260,7 +260,7 @@ class TestDUNEPolicyPackage(unittest.TestCase):
         lfn2pfn_fn = algorithms['lfn2pfn']['DUNE']
 
         # generate a test file and test data set name
-        tmp_file1 = server_test.file_generator()
+        tmp_file1 = file_factory.file_generator()
         tmp_dsn1 = 'tests.dune_lfn2pfn_dataset_' + uuid()
 
         # declare file and dataset to MetaCat, including metadata
@@ -289,7 +289,7 @@ class TestDUNEPolicyPackage(unittest.TestCase):
         # remove file from MetaCat
         metacat_client.delete_file(did=file_did1)
 
-    def test_dune_non_deterministic_pfn(self):
+    def test_dune_non_deterministic_pfn(self, file_factory):
         """DUNE(SURL): test the DUNE non-deterministic PFN algorithm"""
         # get the non-deterministic PFN function from the policy package
         from DUNERucioPolicy import get_algorithms
@@ -299,7 +299,7 @@ class TestDUNEPolicyPackage(unittest.TestCase):
         non_deterministic_pfn_fn = algorithms['non_deterministic_pfn']['DUNE_metacat']
 
         # generate a test file and test data set name
-        tmp_file1 = server_test.file_generator()
+        tmp_file1 = file_factory.file_generator()
         tmp_dsn1 = 'tests.dune_non_deterministic_pfn_dataset_' + uuid()
 
         # declare file and dataset to MetaCat, including metadata
@@ -330,10 +330,10 @@ class TestDUNEPolicyPackage(unittest.TestCase):
 
 
 @pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
-def test_dune_replicate():
+def test_dune_replicate(file_factory):
     """DUNE(REPLICATE): test uploading and replicating a file"""
     # generate test file and test dataset name
-    tmp_file1 = server_test.file_generator()
+    tmp_file1 = file_factory.file_generator()
     tmp_dsn1 = 'tests.dune_replicate_dataset_' + uuid()
     scope = 'test'
 
