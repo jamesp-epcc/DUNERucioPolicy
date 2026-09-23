@@ -23,7 +23,6 @@ from rucio.gateway.account import add_account, add_account_attribute, del_accoun
 from rucio.gateway.scope import add_scope
 from rucio.common.config import config_set
 from rucio.common.exception import AccessDenied
-import test_rucio_server as server_test
 from rucio.common.types import InternalAccount, InternalScope
 from rucio.common.utils import generate_uuid as uuid, execute
 from rucio.core import replica as replica_core
@@ -38,6 +37,23 @@ from tests.ruciopytest import NoParallelGroups
 
 
 MAX_POLL_WAIT_SECONDS = 100
+
+
+# Delete rules associated with the given DID
+# We used to import this from Rucio but it moved so we can't anymore
+def delete_rules(did):
+    # get the rules for the file
+    print('Deleting rules')
+    cmd = "rucio rule list {0} | grep {0} | cut -f1 -d\\ ".format(did)
+    print(cmd)
+    exitcode, out, err = execute(cmd)
+    print(out, err)
+    rules = out.split()
+    # delete the rules for the file
+    for rule in rules:
+        cmd = "rucio rule remove {0}".format(rule)
+        print(cmd)
+        exitcode, out, err = execute(cmd)
 
 
 # Connects to the test MetaCat container and logs in
@@ -60,10 +76,10 @@ class TestDUNEPolicyPackage(unittest.TestCase):
     def tearDown(self):
         metacat_client = get_metacat_client()
         for did in self.generated_file_dids:
-            server_test.delete_rules(did)
+            delete_rules(did)
             metacat_client.delete_file(did=did)
         for did in self.generated_dataset_dids:
-            server_test.delete_rules(did)
+            delete_rules(did)
             # Ideally should also remove from MetaCat here, but remove_dataset
             # doesn't appear to actually work
             #metacat_client.remove_dataset(did)
@@ -401,8 +417,8 @@ def test_dune_replicate(file_factory):
             assert replica['rses'][dst_rse_id][0].endswith(expected_pfn)
         
         # clean up
-        server_test.delete_rules(file_did1)
-        server_test.delete_rules(dataset_did1)
+        delete_rules(file_did1)
+        delete_rules(dataset_did1)
         metacat_client.delete_file(did=file_did1)
         remove(tmp_file1)
     finally:
