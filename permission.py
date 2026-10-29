@@ -24,6 +24,7 @@ from rucio.core.rse import list_rse_attributes
 from rucio.core.rse_expression_parser import parse_expression
 from rucio.db.sqla.constants import DIDType, IdentityType
 import functools
+import logging
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -417,6 +418,9 @@ def perm_add_did(issuer: "InternalAccount", kwargs: dict[str, Any], *, session: 
     :returns: True if account is allowed, otherwise False
     """
 
+    logger = logging.getLogger("DUNERucioPolicy")
+    logger(logging.DEBUG, 'Received perm_add_did request')
+    
     if kwargs["type"] == DIDType.FILE and not _files_exist([kwargs]):
         return False
 
@@ -446,6 +450,9 @@ def perm_add_dids(issuer: "InternalAccount", kwargs: dict[str, Any], *, session:
     :returns: True if account is allowed, otherwise False
     """
 
+    logger = logging.getLogger("DUNERucioPolicy")
+    logger(logging.DEBUG, 'Received perm_add_dids request')
+    
     files = [did for did in kwargs["dids"] if did.get("type") in ("F", "FILE", DIDType.FILE)]
 
     if files and not _files_exist(files):
