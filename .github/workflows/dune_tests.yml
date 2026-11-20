@@ -48,7 +48,7 @@ jobs:
           docker exec -t dev-rucio-1 python tests/dune_init_metacat.py
       - name: Install DUNE policy package
         shell: bash
-        run: docker cp $GITHUB_WORKSPACE/DUNERucioPolicy dev-rucio-1:/usr/local/lib/python3.9/site-packages/DUNERucioPolicy
+        run: docker cp $GITHUB_WORKSPACE/DUNERucioPolicy/src/DUNERucioPolicy dev-rucio-1:/usr/local/lib/python3.9/site-packages/DUNERucioPolicy
       - name: Configure DUNE policy package
         shell: bash
         run: |
